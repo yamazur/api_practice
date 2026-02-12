@@ -18,6 +18,6 @@ class EntityQueryModel(BaseModel):
     page: int | None = None
     perPage: int | None = None
 
-class EntityListResponse(BaseModel):
-    content: List[EntityModel]
-    total: int
+# class EntityListResponse(BaseModel):
+#     content: List[EntityModel]
+#     total: int

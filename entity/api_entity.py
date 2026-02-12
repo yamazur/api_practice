@@ -1,3 +1,5 @@
+from typing import List
+
 import allure
 import requests
 
@@ -5,7 +7,7 @@ from config.headers import Headers
 from utils.helper import Helper
 from entity.payloads import Payload
 from entity.endpoints import Endpoint
-from entity.models.entity_model import EntityModel, EntityQueryModel, EntityListResponse
+from entity.models.entity_model import EntityModel
 
 
 class EntityAPI(Helper):
@@ -24,8 +26,11 @@ class EntityAPI(Helper):
         )
         assert response.status_code == 200, response.json()
         self.attach_response(response.json())
-        model = EntityModel(**response.json())
-        return model
+
+        entity_id = response.json()  # это int
+
+        # теперь получаем полноценный объект
+        return entity_id
 
     @allure.step("Получение сущности по ID")
     def get_entity_by_id(self, entity_id):
@@ -42,23 +47,26 @@ class EntityAPI(Helper):
     def get_all_entity(self, query=None):
         response = requests.get(
             url=self.endpoints.GET_ALL,
+            headers=self.headers.basic,
             params=query.model_dump(exclude_none=True) if query else None
         )
         assert response.status_code == 200, response.json()
         self.attach_response(response.json())
-        model = EntityListResponse(**response.json())
-        return model
+        return [
+            EntityModel(**item)
+            for item in response.json()["entity"]
+        ]
 
     @allure.step("Обновление сущности")
     def patch_entity_by_id(self, entity_id, payload):
         response = requests.patch(
             url=self.endpoints.PATCH(entity_id),
             json=payload,
+            headers=self.headers.basic,
         )
-        assert response.status_code == 200, response.json()
-        self.attach_response(response.json())
-        model = EntityModel(**response.json())
-        return model
+        assert response.status_code == 204, response.text
+
+        return self.get_entity_by_id(entity_id)
 
     @allure.step("Удаление сущности")
     def delete_entity_by_id(self, entity_id):

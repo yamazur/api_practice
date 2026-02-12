@@ -4,11 +4,12 @@ from entity.payloads import Payload
 
 
 @pytest.fixture
-def api_entities(api_users):
+def api_entities():
     return EntityAPI()
 
-@pytest.fixture(scope="module")
-def created_entity(api_users):
+@pytest.fixture
+def created_entity(api_entities):
     payload = Payload.create_entity()
-    entity = api_users.create_entity(payload)
+    entity_id = api_entities.create_entity(payload)
+    entity = api_entities.get_entity_by_id(entity_id)
     return entity
