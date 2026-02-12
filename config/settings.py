@@ -6,11 +6,8 @@ load_dotenv() # читаем файл .env и загружаем перемен�
 class Settings:
     BASE_URL = os.getenv("BASE_URL", "http://localhost:8080") # читаем из .env файла, если нет - используем "http://localhost:8080"
     API_PREFIX = "/api" #'то общая "папка", где лежат все  API endpoints
+    API_URL = f"{BASE_URL}{API_PREFIX}"
     DEBUG = os.getenv("DEBUG", "True").lower() == "true"
     REQUEST_TIMEOUT = 5
-
-    @property
-    def api_url(self):
-        return f"{self.BASE_URL}{self.API_PREFIX}"
 
 config = Settings()
