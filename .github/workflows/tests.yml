@@ -38,13 +38,9 @@ jobs:
           echo "Ожидание запуска бэкенда..."
           sleep 10
 
-      - name: Run API tests sequentially
+      - name: Run API tests in parallel
         run: |
-          pytest tests/test_entity.py::TestEntities::test_create_entity -v
-          pytest tests/test_entity.py::TestEntities::test_get_entity -v
-          pytest tests/test_entity.py::TestEntities::test_get_all_entities -v
-          pytest tests/test_entity.py::TestEntities::test_update_entity -v
-          pytest tests/test_entity.py::TestEntities::test_delete_entity -v
+          pytest tests/test_entity.py -n auto -v --alluredir=allure-results
 
       - name: Generate Allure report
         if: always()
