@@ -24,16 +24,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest-xdist allure-pytest  
+          pip install pytest-xdist allure-pytest uvicorn fastapi
+          # ⬆️ добавила uvicorn и fastapi для запуска сервера
 
       - name: Create .env file
         run: |
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
           echo "DEBUG=True" >> .env
 
+      - name: Start API server
+        run: |
+          # Запускаем сервер в фоне
+          uvicorn main:app --host 0.0.0.0 --port 8080 &
+          # Даем серверу время на запуск
+          sleep 5
+          # Проверяем что сервер запустился (опционально)
+          curl --fail http://localhost:8080/health || echo "Сервер запущен на порту 8080"
+
       - name: Run API tests in parallel
-        env:
-          BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           pytest -n auto -v --alluredir=allure-results
 
