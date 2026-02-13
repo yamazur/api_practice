@@ -8,6 +8,6 @@ class Settings:
     API_PREFIX = "/api" #'то общая "папка", где лежат все  API endpoints
     API_URL = f"{BASE_URL}{API_PREFIX}"
     DEBUG = os.getenv("DEBUG", "True").lower() == "true"
-    REQUEST_TIMEOUT = 5
+    REQUEST_TIMEOUT = 15
 
 config = Settings()

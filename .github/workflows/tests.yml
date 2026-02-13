@@ -24,18 +24,35 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest-xdist allure-pytest  # ← для параллельного запуска!
+          pip install pytest-xdist allure-pytest
 
       - name: Create .env file
         run: |
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
           echo "DEBUG=True" >> .env
+          echo "🔍 Содержимое .env:"
+          cat .env
 
-      - name: Run API tests in parallel
-        env:
-          BASE_URL: ${{ secrets.BASE_URL }}
+      - name: Wait for backend to be ready
+        run: |
+          echo "Ожидание запуска бэкенда..."
+          sleep 10
+
+      - name: Debug API connection
+        run: |
+          echo "🔍 Проверка доступности API..."
+          curl -v ${{ secrets.BASE_URL }}/api/create \
+            -H "Content-Type: application/json" \
+            -d '{"title":"test","verified":true,"important_numbers":[1,2,3],"addition":{"additional_info":"test","additional_number":123}}' \
+            || echo "❌ API не отвечает"
+
+      - name: Run API tests sequentially
         run: |
           pytest tests/test_entity.py::TestEntities::test_create_entity -v
+          pytest tests/test_entity.py::TestEntities::test_get_entity -v
+          pytest tests/test_entity.py::TestEntities::test_get_all_entities -v
+          pytest tests/test_entity.py::TestEntities::test_update_entity -v
+          pytest tests/test_entity.py::TestEntities::test_delete_entity -v
 
       - name: Generate Allure report
         if: always()
