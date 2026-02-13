@@ -25,21 +25,42 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest-xdist allure-pytest uvicorn fastapi
-          # ⬆️ добавила uvicorn и fastapi для запуска сервера
 
       - name: Create .env file
         run: |
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
           echo "DEBUG=True" >> .env
+          echo "Содержимое .env файла:"
+          cat .env
 
       - name: Start API server
         run: |
-          # Запускаем сервер в фоне
-          uvicorn main:app --host 0.0.0.0 --port 8080 &
+          echo "Запускаем сервер на порту 8080..."
+          
+          # Проверим, какой файл main.py существует
+          ls -la main.py || echo "main.py не найден"
+          
+          # Запускаем сервер и сохраняем логи
+          uvicorn main:app --host 0.0.0.0 --port 8080 --log-level debug > server.log 2>&1 &
+          SERVER_PID=$!
+          echo "Сервер запущен с PID: $SERVER_PID"
+          
           # Даем серверу время на запуск
-          sleep 5
-          # Проверяем что сервер запустился (опционально)
-          curl --fail http://localhost:8080/health || echo "Сервер запущен на порту 8080"
+          sleep 10
+          
+          # Проверяем, запущен ли процесс
+          ps aux | grep uvicorn
+          
+          # Смотрим логи сервера
+          echo "Логи сервера:"
+          cat server.log || echo "Логов нет"
+          
+          # Проверяем, слушает ли порт 8080
+          netstat -tlnp | grep 8080 || echo "Порт 8080 не слушает"
+          
+          # Пробуем сделать запрос к серверу
+          echo "Пробуем подключиться к серверу..."
+          curl -v http://localhost:8080/health || curl -v http://localhost:8080/docs || echo "Сервер не отвечает"
 
       - name: Run API tests in parallel
         run: |
