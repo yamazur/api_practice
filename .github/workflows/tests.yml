@@ -38,21 +38,9 @@ jobs:
           echo "Ожидание запуска бэкенда..."
           sleep 10
 
-      - name: Debug API connection
+      - name: Run API tests in parallel
         run: |
-          echo "🔍 Проверка доступности API..."
-          curl -v ${{ secrets.BASE_URL }}/api/create \
-            -H "Content-Type: application/json" \
-            -d '{"title":"test","verified":true,"important_numbers":[1,2,3],"addition":{"additional_info":"test","additional_number":123}}' \
-            || echo "❌ API не отвечает"
-
-      - name: Run API tests sequentially
-        run: |
-          pytest tests/test_entity.py::TestEntities::test_create_entity -v
-          pytest tests/test_entity.py::TestEntities::test_get_entity -v
-          pytest tests/test_entity.py::TestEntities::test_get_all_entities -v
-          pytest tests/test_entity.py::TestEntities::test_update_entity -v
-          pytest tests/test_entity.py::TestEntities::test_delete_entity -v
+          pytest tests/test_entity.py -n auto -v --alluredir=allure-results
 
       - name: Generate Allure report
         if: always()
