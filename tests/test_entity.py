@@ -1,11 +1,10 @@
 import allure
-import pytest
 
 from conftest import api_entities
 from entity.payloads import Payload
 
 
-class TestEntities:
+class TestEntity:
 
     @allure.title("Create new entity")
     def test_create_entity(self, api_entities, create_entity):
@@ -41,4 +40,3 @@ class TestEntities:
     def test_delete_entity(self, api_entities, create_entity):
         delete_entity = api_entities.delete_entity_by_id(create_entity.id)
         assert delete_entity == 204
-

@@ -33,11 +33,6 @@ jobs:
           echo "🔍 Содержимое .env:"
           cat .env
 
-      - name: Wait for backend to be ready
-        run: |
-          echo "Ожидание запуска бэкенда..."
-          sleep 10
-
       - name: Run API tests sequentially
         run: |
           pytest tests/test_entity.py::TestEntities::test_create_entity -v
