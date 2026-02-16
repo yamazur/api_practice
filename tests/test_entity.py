@@ -1,7 +1,7 @@
 import allure
 
 from conftest import api_entities
-from entity.payloads import Payload
+from entity.models.entity_model import EntityModel
 
 
 class TestEntity:
@@ -25,7 +25,7 @@ class TestEntity:
 
     @allure.title("Update entity")
     def test_update_entity(self, api_entities, create_entity):
-        update_payload = Payload.update_entity()
+        update_payload = EntityModel.fake()
 
         # Метод вернёт обновлённую сущность после GET
         updated_entity = api_entities.patch_entity_by_id(
