@@ -28,7 +28,7 @@ class EntityAPI(Helper):
         entity_id = response.json()  # это int
 
         # теперь получаем полноценный объект
-        return entity_id
+        return self.get_entity_by_id(entity_id)
 
     @allure.step("Получение сущности по ID")
     def get_entity_by_id(self, entity_id):
@@ -64,7 +64,7 @@ class EntityAPI(Helper):
             headers=self.headers.basic,
         )
         assert response.status_code == 204, response.text
-        self.attach_response(response.json())
+        self.attach_response(f"Status code: {response.status_code}")
 
         return self.get_entity_by_id(entity_id)
 

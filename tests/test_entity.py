@@ -33,7 +33,7 @@ class TestEntity:
             payload=update_payload
         )
         # Проверяем, что поле обновилось
-        assert updated_entity.title == update_payload["title"]
+        assert updated_entity.title == update_payload.title
         api_entities.delete_entity_by_id(create_entity.id)
 
     @allure.title("Delete entity")
