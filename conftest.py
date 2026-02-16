@@ -1,5 +1,6 @@
 import pytest
 from entity.api_entity import EntityAPI
+from entity.models.entity_model import EntityModel
 from entity.payloads import Payload
 
 
@@ -9,7 +10,7 @@ def api_entities():
 
 @pytest.fixture
 def create_entity(api_entities):
-    payload = Payload.create_entity()
-    entity_id = api_entities.create_entity(payload)
-    entity = api_entities.get_entity_by_id(entity_id)
-    return entity
+    """Фикстура для создания тестовой сущности"""
+    payload = EntityModel.fake()  # ✅ используем Pydantic модель
+    entity = api_entities.create_entity(payload)
+    yield entity
