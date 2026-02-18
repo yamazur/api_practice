@@ -1,7 +1,6 @@
 import pytest
 from entity.api_entity import EntityAPI
 from entity.models.entity_model import EntityModel
-from entity.payloads import Payload
 
 
 @pytest.fixture
