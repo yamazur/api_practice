@@ -1,0 +1,55 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, test ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-xdist allure-pytest
+
+      - name: Create .env file
+        run: |
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "DEBUG=True" >> .env
+          echo "🔍 Содержимое .env:"
+          cat .env
+
+      - name: Run API tests sequentially
+        run: |
+          pytest tests/test_entity.py::TestEntities::test_create_entity -v
+          pytest tests/test_entity.py::TestEntities::test_get_entity -v
+          pytest tests/test_entity.py::TestEntities::test_get_all_entities -v
+          pytest tests/test_entity.py::TestEntities::test_update_entity -v
+          pytest tests/test_entity.py::TestEntities::test_delete_entity -v
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
